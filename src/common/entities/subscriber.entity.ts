@@ -2,7 +2,7 @@ import { Column, Entity, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from
 import { Help } from "./help.entity";
 
 
-@Entity()
+@Entity({ name: 'subscriber' })
 export class Subscriber {
 
     @PrimaryColumn()
