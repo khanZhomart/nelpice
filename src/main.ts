@@ -12,7 +12,8 @@ async function bootstrap() {
     .setTitle('Nelpice API')
     .setDescription('API description')
     .setVersion('1.0')
-    .addTag('service')
+    .addTag('help')
+    .addTag('subs')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

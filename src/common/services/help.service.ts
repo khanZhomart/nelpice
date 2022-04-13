@@ -15,6 +15,10 @@ export class HelpService implements Servable<Help> {
         return this.helpRepository.find();
     }
 
+    findAllBySubscriber(id: number): Promise<Help[]> {
+        return this.helpRepository.find({ where: { subscriber: { id } } });
+    }
+
     findById(id: number): Promise<Help> {
         return this.helpRepository.findOne({ where: { id } });
     }
