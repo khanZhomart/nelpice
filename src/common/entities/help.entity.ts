@@ -11,7 +11,7 @@ export class Help {
 
     @Column()
     @ApiProperty()
-    text: string;
+    status: string;
 
     @ManyToOne(
         () => Subscriber, 
