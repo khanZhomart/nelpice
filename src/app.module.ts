@@ -1,8 +1,10 @@
 import { Module } from '@nestjs/common';
+import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { HelpModule } from './common/modules/help.module';
+import { NitecModule } from './common/modules/nitec.module';
 import { SubscriberModule } from './common/modules/subscriber.module';
 
 @Module({
@@ -15,10 +17,12 @@ import { SubscriberModule } from './common/modules/subscriber.module';
       password: '12345',
       database: 'nelpicedb',
       autoLoadEntities: true,
-      synchronize: true,
+      synchronize: true
     }),
     HelpModule,
-    SubscriberModule
+    SubscriberModule,
+    NitecModule,
+    ScheduleModule.forRoot()
   ],
   controllers: [AppController],
   providers: [AppService],

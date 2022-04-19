@@ -1,11 +1,14 @@
-import { Body, Controller, Get, Param, Post } from "@nestjs/common";
+import { Body, Controller, Get, Logger, Param, Post, Req } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
+import { request } from "http";
 import { Help } from "../entities/help.entity";
 import { HelpService } from "../services/help.service";
 
 @ApiTags('help')
 @Controller('help')
 export class HelpController {
+    private readonly logger = new Logger(HelpController.name)
+
     constructor(private readonly helpService: HelpService) {}
 
     @Get()
@@ -24,7 +27,7 @@ export class HelpController {
     }
 
     @Post('save')
-    save(@Body() payload: Help): Promise<Help> {
-        return this.helpService.save(payload);
+    save(@Body('userId') id: number, @Body('help') payload: Help): Promise<Help> {
+        return this.helpService.save(id, payload);
     }
 }

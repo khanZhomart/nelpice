@@ -16,7 +16,7 @@ export class Subscriber {
     @OneToMany(
         () => Help, 
         help => help.subscriber,
-        { cascade: ['insert', 'update'] }
+        { cascade: true }
     )
     @ApiProperty()
     requests: Help[]

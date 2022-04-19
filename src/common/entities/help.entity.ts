@@ -15,7 +15,8 @@ export class Help {
 
     @ManyToOne(
         () => Subscriber, 
-        subscriber => subscriber.requests
+        subscriber => subscriber.requests,
+        { onDelete: 'SET NULL', eager: true }
     )
     @JoinColumn({ name: 'subscriber_id' })
     @ApiProperty()
