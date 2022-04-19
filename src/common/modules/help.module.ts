@@ -8,6 +8,7 @@ import { SubscriberModule } from "./subscriber.module";
 @Module({
     imports: [TypeOrmModule.forFeature([Help]), SubscriberModule],
     providers: [HelpService],
-    controllers: [HelpController]
+    controllers: [HelpController],
+    exports: [HelpService]
 })
 export class HelpModule {}
