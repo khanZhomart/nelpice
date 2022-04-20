@@ -14,7 +14,7 @@ export class NitecService {
     private readonly helpService: HelpService
 
     @Cron('* * * * * *')
-    async handleTask() {
+    public async handleTask() {
         const subs = await this.subscriberService.findAll()
     }
 }

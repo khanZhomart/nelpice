@@ -2,7 +2,7 @@ import tus from 'tus-js-client';
 
 export class TusService {
     
-    static upload(file: any): string {
+    public static upload(file: any): string {
         var upload = new tus.Upload(file, {
             endpoint: "https://sb.egov.kz/upload/",
             retryDelays: [0, 3000, 5000, 10000, 20000],

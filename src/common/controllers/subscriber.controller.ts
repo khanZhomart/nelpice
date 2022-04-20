@@ -9,17 +9,17 @@ export class SubscriberController {
     constructor(private readonly subscriberService: SubscriberService) {}
 
     @Get()
-    findAll(): Promise<Subscriber[]> {
+    public findAll(): Promise<Subscriber[]> {
         return this.subscriberService.findAll();
     }
 
     @Get(":id")
-    findById(@Param('id') id: string): Promise<Subscriber> {
+    public findById(@Param('id') id: string): Promise<Subscriber> {
         return this.subscriberService.findById(Number(id));
     }
 
     @Post('save')
-    save(@Body() payload: Subscriber): Promise<Subscriber> {
+    public save(@Body() payload: Subscriber): Promise<Subscriber> {
         return this.subscriberService.save(payload);
     }
 }

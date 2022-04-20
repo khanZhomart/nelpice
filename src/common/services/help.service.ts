@@ -16,25 +16,25 @@ export class HelpService {
         private readonly subscriberService: SubscriberService
     ) {}
 
-    findAll(): Promise<Help[]> {
+    public findAll(): Promise<Help[]> {
         return this.helpRepository.find()
     }
 
-    findAllBySubscriber(id: number): Promise<Help[]> {
+    public findAllBySubscriber(id: number): Promise<Help[]> {
         return this.helpRepository.find({ where: { subscriber: { id } } });
     }
 
-    findById(id: number): Promise<Help> {
+    public findById(id: number): Promise<Help> {
         return this.helpRepository.findOne({ where: { id } });
     }
 
-    async save(id: number, payload: Help): Promise<Help> {
+    public async save(id: number, payload: Help): Promise<Help> {
         var subscriber = await this.subscriberService.findById(id)
         payload.subscriber = subscriber
         return this.helpRepository.save(payload);
     }
 
-    async remove(id: number): Promise<void> {
+    public async remove(id: number): Promise<void> {
         await this.helpRepository.delete(id);
     }
 }

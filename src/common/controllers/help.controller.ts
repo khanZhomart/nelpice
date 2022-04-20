@@ -12,22 +12,22 @@ export class HelpController {
     constructor(private readonly helpService: HelpService) {}
 
     @Get()
-    findAll(): Promise<Help[]> {
+    public findAll(): Promise<Help[]> {
         return this.helpService.findAll();
     }
 
     @Get(":id")
-    findById(@Param('id') id: string): Promise<Help> {
+    public findById(@Param('id') id: string): Promise<Help> {
         return this.helpService.findById(Number(id));
     }
 
     @Get("subscriber/:id")
-    findAllBySubscriber(@Param('id') id: string): Promise<Help[]> {
+    public findAllBySubscriber(@Param('id') id: string): Promise<Help[]> {
         return this.helpService.findAllBySubscriber(Number(id));
     }
 
     @Post('save')
-    save(@Body('userId') id: number, @Body('help') payload: Help): Promise<Help> {
+    public save(@Body('userId') id: number, @Body('help') payload: Help): Promise<Help> {
         return this.helpService.save(id, payload);
     }
 }
