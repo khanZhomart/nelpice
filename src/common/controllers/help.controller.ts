@@ -27,7 +27,12 @@ export class HelpController {
     }
 
     @Post('save')
-    public save(@Body('userId') id: number, @Body('help') payload: Help): Promise<Help> {
+    public save(
+        @Req() request,
+        @Body('user_id') id: number, 
+        @Body('help') payload: Help
+    ): Promise<Help> {
+        this.logger.debug(request.body)
         return this.helpService.save(id, payload);
     }
 }

@@ -1,14 +1,16 @@
+import { Injectable } from '@nestjs/common';
 import tus from 'tus-js-client';
 
+@Injectable()
 export class TusService {
     
-    public static upload(file: any): string {
-        var upload = new tus.Upload(file, {
+    public upload(urls: string[]): string {
+        var upload = new tus.Upload(null, {
             endpoint: "https://sb.egov.kz/upload/",
             retryDelays: [0, 3000, 5000, 10000, 20000],
             metadata: {
-                filename: file.name,
-                filetype: file.type
+                filename: null,
+                filetype: null
             },
             onError: function(error) {
                 console.log("Failed because: " + error)
