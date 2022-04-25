@@ -3,6 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Help } from "../entities/help.entity";
 import { SubscriberService } from "./subscriber.service";
+import { TusService } from "./tus.service";
 
 @Injectable()
 export class HelpService {
@@ -12,8 +13,10 @@ export class HelpService {
         @InjectRepository(Help)
         private helpRepository: Repository<Help>,
         @Inject(SubscriberService)
-        private readonly subscriberService: SubscriberService
-    ) {  }
+        private readonly subscriberService: SubscriberService,
+        @Inject(TusService)
+        private readonly tusService: TusService
+    ) {}
 
     public findAll(): Promise<Help[]> {
         return this.helpRepository.find()
@@ -31,6 +34,8 @@ export class HelpService {
         var subscriber = await this.subscriberService.findById(id)
 
         payload.subscriber = subscriber
+
+        this.tusService.upload(payload.files)
         
         return this.helpRepository.save(payload);
     }
