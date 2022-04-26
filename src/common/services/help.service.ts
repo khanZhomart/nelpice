@@ -35,8 +35,12 @@ export class HelpService {
 
         payload.subscriber = subscriber
 
-        this.tusService.upload(payload.files)
+        var response: string[]
+
+        await this.tusService.upload(payload.files, (url) => response.push(url))
         
+        console.log(response)
+
         return this.helpRepository.save(payload);
     }
 

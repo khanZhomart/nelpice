@@ -2,22 +2,69 @@ import { Injectable } from '@nestjs/common';
 import * as tus from 'tus-js-client'
 import * as https from 'https'
 import * as fs from 'fs'
+import { File } from '../entities/embeddables/file.embed';
+import axios from 'axios';
 
 @Injectable()
 export class TusService {
     
-    public upload(urls: string[]): string[] {
-        this.downloadFiles(urls)
-        const filenames = this.getFilenames(urls)
+    private delay(t) {
+        return new Promise(resolve => setTimeout(resolve, t));
+    }
+
+    public async upload(files: File[], callback: any) {
+        await this.downloadFiles(files)
+
+        await this.delay(20_000)
+
+        return this.uploadToNitec(files, callback)
+    }
+
+    public async downloadFiles(files: File[]) {
+        files.forEach(async (file) => {
+            const params = file.url.split("/")
+            const filename = params[params.length - 1]
+            const path = "src/storage/temp/" + filename
+
+            const writer = fs.createWriteStream(path)
+
+            const response = await axios({
+                method: 'get',
+                url: file.url,
+                responseType: 'stream'
+            })
+
+            if (response.status !== 200) {
+                console.log('error', response.status)
+                return
+            }
+
+            response.data.pipe(writer)
+
+            return new Promise((resolve, reject) => {
+                writer.on('finish', () => {
+                    console.log('downloaded file')
+                    resolve()
+                })
+                writer.on('error', () => reject)
+            })
+        })
+    }
+
+    private uploadToNitec(files: File[], callback: any) {
         const tusUrls: string[] = []
 
-        filenames.forEach((file) => {
-            var upload = new tus.Upload(null, {
+        files.forEach((file) => {
+            const filename = this.getFilename(file.url)
+            const file_stream = fs.createReadStream("src/storage/temp/" + filename)
+            
+            var upload = new tus.Upload(file_stream, {
                 endpoint: "https://sb.egov.kz/upload/",
                 retryDelays: [0, 3000, 5000, 10000, 20000],
                 metadata: {
-                    filename: "src/storage/temp/" + file
+                    filename: filename
                 },
+                uploadSize: Number(file.size),
                 onError: function(error) {
                     console.log("Failed because: " + error)
                 },
@@ -34,35 +81,11 @@ export class TusService {
             upload.start()
         })
 
-        return tusUrls;
+        return tusUrls
     }
 
-    public async downloadFiles(urls: string[]) {
-        urls.forEach(async (url) => {
-            https.get(url, (response) => {
-                const params = url.split("/")  
-                const filename = params[params.length - 1]
-                const path = "src/storage/temp/" + filename
-    
-                const file_path = fs.createWriteStream(path)
-                response.pipe(file_path)
-                file_path.on('finish', () => {
-                    file_path.close()
-                    console.log('download of ' + params[params.length - 1] + " completed")
-                })
-            })
-        })
-    }
-
-    private getFilenames(urls: string[]) {
-        const filenames: string[] = []
-
-        urls.forEach((url) => {
-            const params = url.split("/")
-            const filename = params[params.length - 1]
-            filenames.push(filename)
-        })
-
-        return filenames
+    private getFilename(url: string) {
+        const params = url.split("/")
+        return params[params.length - 1]
     }
 }

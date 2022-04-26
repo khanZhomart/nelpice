@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Column, Entity, Generated, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
+import { File } from "./embeddables/file.embed";
 import { Subscriber } from "./subscriber.entity";
 
 @Entity({ name: 'help' })
@@ -27,12 +28,9 @@ export class Help {
     @ApiProperty()
     text: string;
 
-    @Column(
-        'text',
-        { array: true }
-    )
+    @Column(() => File)
     @ApiProperty()
-    files: string[]
+    files: File[]
 
     @ManyToOne(
         () => Subscriber, 
