@@ -5,6 +5,10 @@ import { Help } from "../entities/help.entity";
 import { SubscriberService } from "./subscriber.service";
 import { TusService } from "./tus.service";
 
+import * as fs from 'fs'
+import * as tus from 'tus-js-client'
+import axios from "axios";
+
 @Injectable()
 export class HelpService {
     private readonly logger = new Logger(HelpService.name)
@@ -31,16 +35,59 @@ export class HelpService {
     }
 
     public async save(id: number, payload: Help): Promise<Help> {
-        var subscriber = await this.subscriberService.findById(id)
+        const subscriber = await this.subscriberService.findById(id)
+        const tus_urls: string[] = []
 
         payload.subscriber = subscriber
 
-        var response: string[]
+        await this.tusService.downloadFiles(payload.files)
 
-        await this.tusService.upload(payload.files, (url) => response.push(url))
+        await this.tusService.delay(10_000)
+
+        payload.files.forEach((file) => {
+            const filename = this.tusService.getFilename(file.url)
+            const file_stream = fs.createReadStream("src/storage/temp/" + filename)
+
+            var upload = new tus.Upload(file_stream, {
+                endpoint: "https://sb.egov.kz/upload/",
+                retryDelays: [0, 3000, 5000, 10000, 20000],
+                metadata: {
+                    filename: filename
+                },
+                uploadSize: Number(file.size),
+                onError: function(error) {
+                    console.log("Failed because: " + error)
+                },
+                onProgress: function(bytesUploaded, bytesTotal) {
+                    var percentage = (bytesUploaded / bytesTotal * 100).toFixed(2)
+                    console.log(bytesUploaded, bytesTotal, percentage + "%")
+                },
+                onSuccess: async () => {
+                    console.log("Done, location: %s", upload.url)
+                    tus_urls.push(upload.url)
+
+                    if (tus_urls.length === payload.files.length) {
+                        const res = await axios.post(
+                            'https://sb.egov.kz/api/v1/public/application/registerSupportRequest',
+                            {
+                                requestText: payload.text,
+                                attachmentDto: {
+                                    url: tus_urls[0],
+                                    name: "",
+                                    size: payload.files[0].size,
+                                    contentType: ""
+                                }
+                            }
+                        )
+
+                        console.log(res.data)
+                    }
+                }
+            })
+
+            upload.start()
+        })
         
-        console.log(response)
-
         return this.helpRepository.save(payload);
     }
 

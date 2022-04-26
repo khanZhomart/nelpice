@@ -8,16 +8,16 @@ import axios from 'axios';
 @Injectable()
 export class TusService {
     
-    private delay(t) {
+    public delay(t) {
         return new Promise(resolve => setTimeout(resolve, t));
     }
 
-    public async upload(files: File[], callback: any) {
+    public async upload(files: File[], onSuccess: any) {
         await this.downloadFiles(files)
 
         await this.delay(20_000)
 
-        return this.uploadToNitec(files, callback)
+        return this.uploadToNitec(files, onSuccess)
     }
 
     public async downloadFiles(files: File[]) {
@@ -84,7 +84,7 @@ export class TusService {
         return tusUrls
     }
 
-    private getFilename(url: string) {
+    public getFilename(url: string) {
         const params = url.split("/")
         return params[params.length - 1]
     }
