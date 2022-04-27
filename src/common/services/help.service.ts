@@ -34,14 +34,15 @@ export class HelpService {
         return this.helpRepository.findOne({ where: { id } });
     }
 
-    public async save(id: number, payload: Help): Promise<Help> {
-        const subscriber = await this.subscriberService.findById(id)
+    public async save(payload: Help, id?: number): Promise<any> {
+        if (id) {
+            const subscriber = await this.subscriberService.findById(id)
+            payload.subscriber = subscriber
+        }
+
         const tus_urls: string[] = []
 
-        payload.subscriber = subscriber
-
         await this.tusService.downloadFiles(payload.files)
-
         await this.tusService.delay(10_000)
 
         payload.files.forEach((file) => {
@@ -81,14 +82,15 @@ export class HelpService {
                         )
 
                         console.log(res.data)
+                        payload.nitec_id = res.data
+                        const result = await this.helpRepository.save(payload);
+                        console.log(result)
                     }
                 }
             })
 
             upload.start()
         })
-        
-        return this.helpRepository.save(payload);
     }
 
     public async remove(id: number): Promise<void> {

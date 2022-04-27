@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Column, Entity, Generated, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
+import { Answer } from "./embeddables/answer.embed";
 import { File } from "./embeddables/file.embed";
 import { Subscriber } from "./subscriber.entity";
 
@@ -18,11 +19,9 @@ export class Help {
     @ApiProperty()
     nitec_id: string;
 
-    @Column({
-        nullable: true
-    })
+    @Column(() => Answer)
     @ApiProperty()
-    status: string;
+    answer: Answer
 
     @Column()
     @ApiProperty()

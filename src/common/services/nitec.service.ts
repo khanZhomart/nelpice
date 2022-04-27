@@ -22,24 +22,26 @@ export class NitecService {
     @Inject(TusService)
     private readonly tusService: TusService
 
-    @Cron('* * * * * *')
+    @Cron('*/20 * * * * *')
     public async handleTask() {
-        // const subs: Help[] = await this.helpService.findAll()
-        // const answered: Help[] = []
+        const subs: Help[] = await this.helpService.findAll()
+        const answered: Help[] = []
 
-        // subs.forEach(async (item) => {
-        //     const actual = await this.findActualRequestById(item.id)
+        if (subs.length === 0) {
+            return
+        }
 
-        //     if (actual.answerText !== item.status) {
-        //         return answered.push(item)
-        //     }
-        // })
-    }
+        subs.forEach(async (item) => {
+            const actual = await this.findActualRequestById(item.id)
+            this.logger.debug('actual status', actual)
+            if (actual.successfully) {
+                item.answer.date = actual.answerDate
+                item.answer.successfully = actual.successfully
+                item.answer.text = actual.answerText
 
-    public async sendRequestToNitec(payload: Help) {
-        var request: HelpDto
-
-        request.requestText = payload.text
+                await this.helpService.save(item)
+            }
+        })
     }
 
     private async findActualRequestById(id: number): Promise<HelpStatusDto> {

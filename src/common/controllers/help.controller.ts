@@ -33,6 +33,6 @@ export class HelpController {
         @Body('help') payload: Help
     ): Promise<Help> {
         this.logger.debug(request.body)
-        return this.helpService.save(id, payload);
+        return this.helpService.save(payload, id);
     }
 }
