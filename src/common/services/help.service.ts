@@ -68,16 +68,27 @@ export class HelpService {
                     tus_urls.push(upload.url)
 
                     if (tus_urls.length === payload.files.length) {
+                        const attachments = []
+
+                        for (var i = 0; i < tus_urls.length; ++i) {
+                            attachments.push({
+                                url: tus_urls[i],
+                                name: "",
+                                size: payload.files[i].size,
+                                contentType: ""
+                            })
+                        }
+
                         const res = await axios.post(
                             'https://sb.egov.kz/api/v1/public/application/registerSupportRequest',
                             {
                                 requestText: payload.text,
-                                attachmentDto: {
-                                    url: tus_urls[0],
-                                    name: "",
-                                    size: payload.files[0].size,
-                                    contentType: ""
-                                }
+                                attachmentDto: attachments,
+                                senderFio: payload.senderFio,
+                                senderEmail: payload.senderEmail,
+                                senderPhone: payload.senderPhone,
+                                senderOrgBin: payload.senderOrgBin,
+                                senderOrgName: payload.senderOrgName
                             }
                         )
 

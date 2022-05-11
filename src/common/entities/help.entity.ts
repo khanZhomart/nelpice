@@ -27,6 +27,26 @@ export class Help {
     @ApiProperty()
     text: string;
 
+    @Column()
+    @ApiProperty()
+    senderFio: string;
+
+    @Column()
+    @ApiProperty()
+    senderEmail: string;
+
+    @Column()
+    @ApiProperty()
+    senderPhone: string;
+
+    @Column()
+    @ApiProperty()
+    senderOrgBin: string;
+
+    @Column()
+    @ApiProperty()
+    senderOrgName: string;
+
     @Column(() => File)
     @ApiProperty()
     files: File[]
