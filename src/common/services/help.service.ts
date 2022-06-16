@@ -2,7 +2,6 @@ import { Inject, Injectable, Logger } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Help } from "../entities/help.entity";
-import { SubscriberService } from "./subscriber.service";
 import { TusService } from "./tus.service";
 
 import * as fs from 'fs'
@@ -16,8 +15,6 @@ export class HelpService {
     constructor (
         @InjectRepository(Help)
         private helpRepository: Repository<Help>,
-        @Inject(SubscriberService)
-        private readonly subscriberService: SubscriberService,
         @Inject(TusService)
         private readonly tusService: TusService
     ) {}
@@ -26,20 +23,26 @@ export class HelpService {
         return this.helpRepository.find()
     }
 
-    public findAllBySubscriber(id: number): Promise<Help[]> {
-        return this.helpRepository.find({ where: { subscriber: { id } } });
-    }
-
     public findById(id: number): Promise<Help> {
         return this.helpRepository.findOne({ where: { id } });
     }
 
-    public async save(payload: Help, id?: number): Promise<any> {
-        if (id) {
-            const subscriber = await this.subscriberService.findById(id)
-            payload.subscriber = subscriber
-        }
+    public async findAllAnswered(): Promise<Help[]> {
+        this.logger.debug("Request to get answered")
+        const helps: Help[] = await this.findAll()
 
+        const answered_helps: Help[] = helps.filter((h) => h.answer.successfully)
+        this.logger.debug(answered_helps)
+        this.helpRepository.remove(answered_helps)
+
+        return answered_helps 
+    }
+
+    public async update(payload: Help): Promise<any> {
+        return this.helpRepository.save(payload)
+    }
+
+    public async save(payload: Help): Promise<any> {
         const tus_urls: string[] = []
 
         await this.tusService.downloadFiles(payload.files)

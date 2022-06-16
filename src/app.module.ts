@@ -5,7 +5,6 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { HelpModule } from './common/modules/help.module';
 import { NitecModule } from './common/modules/nitec.module';
-import { SubscriberModule } from './common/modules/subscriber.module';
 
 @Module({
   imports: [
@@ -20,7 +19,6 @@ import { SubscriberModule } from './common/modules/subscriber.module';
       synchronize: true
     }),
     HelpModule,
-    SubscriberModule,
     NitecModule,
     ScheduleModule.forRoot()
   ],

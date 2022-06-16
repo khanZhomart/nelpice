@@ -1,20 +1,15 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
 import axios, { AxiosResponse } from 'axios'
-import { HelpDto } from "../entities/dto/help.dto";
 import { HelpStatusDto } from "../entities/dto/status.dto";
 import { Help } from "../entities/help.entity";
 import { HelpService } from "./help.service";
-import { SubscriberService } from './subscriber.service'
 import { TusService } from "./tus.service";
 
 @Injectable()
 export class NitecService {
     private readonly logger = new Logger(NitecService.name)
     private readonly BASE_NITEC_URL = 'https://sb.egov.kz/api/v1/public/application'
-
-    @Inject(SubscriberService)
-    private readonly subscriberService: SubscriberService
 
     @Inject(HelpService)
     private readonly helpService: HelpService
@@ -34,12 +29,13 @@ export class NitecService {
         subs.forEach(async (item) => {
             const actual = await this.findActualRequestById(item.id)
             this.logger.debug('actual status', actual)
+
             if (actual.successfully) {
                 item.answer.date = actual.answerDate
                 item.answer.successfully = actual.successfully
                 item.answer.text = actual.answerText
 
-                await this.helpService.save(item)
+                await this.helpService.update(item)
             }
         })
     }
